@@ -119,6 +119,5 @@ app.listen(app.get("port"), () => {
 
 /** Utils */
 const getTokenFromHeader = (req) => {
-  console.log(req.get("Authorization"));
   return req.get("Authorization");
 };

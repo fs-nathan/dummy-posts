@@ -24,6 +24,40 @@ function login(data, success, fail) {
     .catch(fail);
 }
 
+function getPosts(token, success, fail) {
+  return fetch("/api/posts", {
+    headers: makeHeader(token),
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(success)
+    .catch(fail);
+}
+
+function createPost(token, data) {
+  return fetch("/api/posts", {
+    method: "post",
+    body: JSON.stringify(data),
+    headers: makeHeader(token),
+  }).then(checkStatus);
+}
+
+function updatePost(token, data) {
+  return fetch("/api/posts", {
+    method: "put",
+    body: JSON.stringify(data),
+    headers: makeHeader(token),
+  }).then(checkStatus);
+}
+
+function deletePost(token, data) {
+  return fetch("/api/posts", {
+    method: "delete",
+    body: JSON.stringify(data),
+    headers: makeHeader(token),
+  }).then(checkStatus);
+}
+
 function checkStatus(response) {
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -42,4 +76,8 @@ function parseJSON(response) {
 
 export default {
   login,
+  getPosts,
+  createPost,
+  updatePost,
+  deletePost,
 };
