@@ -2,6 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
+const _ = require("lodash");
+const { v4: uuidv4 } = require("uuid");
 const app = express();
 
 const USERS_FILE = path.join(__dirname, "data/users.json");
@@ -40,6 +42,68 @@ app.post("/login", (req, res) => {
     } else {
       res.json(200, found[0]);
     }
+  });
+});
+
+/** Get list posts */
+app.get("/api/posts", (req, res) => {
+  fs.readFile(POSTS_FILE, (err, data) => {
+    const token = getTokenFromHeader(req);
+    let posts = JSON.parse(data);
+    posts = posts.filter((post) => post.ownerId === token);
+    res.setHeader("Cache-Control", "no-cache");
+    res.json(posts);
+  });
+});
+
+/** Create new post */
+app.post("/api/posts", (req, res) => {
+  fs.readFile(POSTS_FILE, (err, data) => {
+    const token = getTokenFromHeader(req);
+    const posts = JSON.parse(data);
+    const newPost = {
+      title: req.body.title,
+      ownerId: token,
+      id: uuidv4(),
+    };
+    posts.push(newPost);
+    fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4), () => {
+      res.setHeader("Cache-Control", "no-cache");
+      res.json(posts);
+    });
+  });
+});
+
+/** Update post */
+app.put("/api/posts", (req, res) => {
+  fs.readFile(POSTS_FILE, (err, data) => {
+    const token = getTokenFromHeader(req);
+    let posts = JSON.parse(data);
+    posts.forEach((post) => {
+      if (post.ownerId === token && post.id === req.body.id) {
+        post.title = req.body.title;
+      }
+    });
+    fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4), () => {
+      res.json({});
+    });
+  });
+});
+
+app.delete("/api/posts", (req, res) => {
+  fs.readFile(POSTS_FILE, (err, data) => {
+    const token = getTokenFromHeader(req);
+    let posts = JSON.parse(data);
+    posts = posts.reduce((memo, post) => {
+      if (post.ownerId === token && post.id === req.body.id) {
+        return memo;
+      } else {
+        return memo.concat(post);
+      }
+    }, []);
+    fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 4), () => {
+      res.json({});
+    });
   });
 });
 /** End of API */
