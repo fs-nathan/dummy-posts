@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 import "./App.css";
-
+import { LoginForm } from "./components/LoginForm";
+import { PostsPage } from "./components/PostsPage";
 const App = () => {
+  const [authenticatedUser, setAuthenticatedUser] = useState({});
   return (
     <>
-      <div>Hello</div>
+      {!_.isEmpty(authenticatedUser) ? (
+        <PostsPage owner={authenticatedUser} />
+      ) : (
+        <LoginForm
+          onLoginSucceeded={(user) => {
+            setAuthenticatedUser(user);
+          }}
+        />
+      )}
     </>
   );
 };
