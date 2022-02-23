@@ -1,1 +1,1 @@
-Demo project for Frontend Test
+Demo frontend-test. No boilerplate used!
