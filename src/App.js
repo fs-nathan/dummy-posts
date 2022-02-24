@@ -4,10 +4,15 @@ import { LoginForm } from "./components/LoginForm";
 import { PostsPage } from "./components/PostsPage";
 const App = () => {
   const [authenticatedUser, setAuthenticatedUser] = useState({});
+  const handleLogout = () => {
+    setAuthenticatedUser(undefined);
+  };
   return (
     <>
       {!_.isEmpty(authenticatedUser) ? (
-        <PostsPage owner={authenticatedUser} />
+        <>
+          <PostsPage owner={authenticatedUser} />
+        </>
       ) : (
         <LoginForm
           onLoginSucceeded={(user) => {
